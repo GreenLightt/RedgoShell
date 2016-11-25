@@ -36,6 +36,11 @@ filepath=$(Relative2AbsolutePath $1)
 CheckGitFolder $filepath
 
 cd $filepath
+
+# config git editor when commit
 git config core.editor vim
+
+# config color print when git command
+git config color.ui auto
 
 echo  "Finish config."
