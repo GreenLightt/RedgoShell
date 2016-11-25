@@ -27,11 +27,29 @@ function Usage() {
     exit 2
 }
 
-function EchoCountNum() {
+function CountNumTotal() {
     author="$1"
     day=$(date -d "$2 1 seconds ago" +'%Y-%m-%d %H:%M:%S')
 
     git log --author="$author" --pretty=format:"" --numstat --since="$day" |
+        gawk '
+            BEGIN {
+                add = 0; subs = 0; sum = 0;
+            }
+            { add += $1; subs += $2; sum += $1 - $2 }
+            END {
+                printf "%9s[+] %9s[-] %9s[+-]", add, subs, sum
+            }
+            '
+}
+
+function CountNumOnce() {
+    author="$1"
+    day_start=$(date -d "$2 1 seconds ago" +'%Y-%m-%d %H:%M:%S')
+    day_end=$(date -d "$day_start 24 hours" +'%Y-%m-%d %H:%M:%S')
+
+    git log --author="$author" --pretty=format:"" --numstat \
+            --since="$day_start" --until="$day_end" | \
         gawk '
             BEGIN {
                 add = 0; subs = 0; sum = 0;
@@ -66,19 +84,19 @@ do
     # Today
     today=$(date +'%Y-%m-%d')
     printf "%-20s %-10s%-15s" "$author" "$today" "[today]"
-    EchoCountNum "$author" $today
+    CountNumOnce "$author" $today
     printf "\n"
 
     # YesterDay
     yesterday=$(date -d "-1 days" +'%Y-%m-%d')
     printf "%-20s %-10s%-15s" "$author" "$yesterday" "[yesterday]"
-    EchoCountNum "$author" $yesterday
+    CountNumOnce "$author" $yesterday
     printf "\n"
 
     # Week
     week=$(date -d "-6 days" +'%Y-%m-%d')
     printf "%-20s %-10s%-15s" "$author" "$week" "[week]"
-    EchoCountNum "$author" $week
+    CountNumTotal "$author" $week
     printf "\n"
 
     printf "\n"
