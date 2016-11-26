@@ -35,6 +35,14 @@ function Usage() {
     exit 2
 }
 
+function OptServiceStop() {
+    /opt/bksite/ctlscript.sh stop
+}
+
+function OptServiceStart() {
+    /opt/bksite/ctlscript.sh start
+}
+
 ##################################
 # Execute
 ##################################
@@ -64,11 +72,17 @@ else
         mv -f $build_folder/install.sql $backup_sql
         cp $tmp_file $build_folder/install.sql
 
+        OptServiceStop >/dev/null 2>&1
         # Backup bkdata.tgz
         MakeFolderExist $bkdata_tgz_bakcup_folder
         backup_bkdata=$bkdata_tgz_bakcup_folder/bkdata.tgz_$(date +"%F")_$$.bak
+        rm -rf $opt_project_folder/bkdata/cache/*
+        rm -rf $opt_project_folder/bkdata/localcache/*
         mv $home_project_folder/bkdata.tgz $backup_bkdata
-        tar -zcvf $home_project_folder/bkdata.tgz $opt_project_folder/bkdata/
+        cd $opt_project_folder;
+        tar -zcvf $home_project_folder/bkdata.tgz --exclude=lang bkdata
+
+        OptServiceStart >/dev/null 2>&1
         echo '================================================================'
         echo 'Result: Replace success.'
         echo 'And sql backup file is at '$backup_sql
