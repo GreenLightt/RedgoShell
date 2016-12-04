@@ -22,6 +22,14 @@ authors=()
 ##################################
 # Function
 ##################################
+function CheckGitRootFolder() {
+    git_root_path=$1
+    if [ ! -d $git_root_path/.git ]; then
+        echo 'Note: '$git_root_path' folder dont container .git folder.'
+        exit 2
+    fi
+}
+
 function GetAllAuthor() {
     tmp_file="/tmp/"$(basename $0)_$(date +"%s")
     $(cd $1; git log --pretty=format:"%an" | sort -u > $tmp_file) 
