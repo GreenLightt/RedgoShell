@@ -11,7 +11,7 @@ database_name=''
 datebase_user=''
 database_password=''
 
-mysql=/opt/bksite/mysql/bin/mysqldump
+mysqldump=''
 back_folder=/tmp/mysql_backup
 
 ##################################
@@ -40,6 +40,9 @@ function ReadConfigFile() {
             'Password')
                 database_password=${param_value//\'/}
                 ;;
+            'MysqlDump')
+                mysqldump=${param_value//\'/}
+                ;;
         esac
     done < $1
 }
@@ -51,6 +54,6 @@ function BackupDataBase() {
     fi
 
     tmp_file="${back_folder}/${database_name}_$(date +%s).sql"
-    $mysql -u$datebase_user -p$database_password $database_name > $tmp_file
+    $mysqldump -u$datebase_user -p$database_password $database_name > $tmp_file
     echo $tmp_file
 }

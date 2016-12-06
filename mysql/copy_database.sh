@@ -20,7 +20,6 @@ source         $filepath/common.sh
 ##################################
 # Variable
 ##################################
-mysql=/opt/bksite/mysql/bin/mysqldump
 back_folder=/tmp/mysql_backup
 
 ##################################
