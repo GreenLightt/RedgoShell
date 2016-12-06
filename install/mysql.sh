@@ -33,6 +33,7 @@ function IsPortOccupied() {
     pid_num=`lsof -i:$port | wc -l`
     if [ $pid_num -gt 0 ]; then
         echo "Port $port has been occupied."
+        exit 2
     fi
 }
 
@@ -41,6 +42,14 @@ function InstallMysql() {
     chmod 755 $run_file
     echo 'Please wait ...'
     $run_file --optionfile $install_config_file --mode unattended
+}
+
+function ConfigMycnf() {
+    echo 'Config bind-addrss and expire_logs_days...'
+    mycnf=$1'/mysql/my.cnf'
+    sed -i \
+        -e 's/^bind-address=.*$/bind-address=0.0.0.0/' \
+        -e '/bind-address/aexpire_logs_days=30' $mycnf
 }
 
 ##################################
@@ -71,7 +80,13 @@ else
 
     if [ $? -eq 0 ]; then
         install_folder=`grep prefix $install_config_file | cut -d"=" -f 2`
+        ConfigMycnf $install_folder
+
+        echo 'Restart Mysql...'
+        $install_folder'/ctlscript.sh' restart
+
         # Finish
+        echo '-----------------------------------------------------------'
         echo "Mysql has been installed in $install_folder, and port is $mysql_port "
     fi
 fi
