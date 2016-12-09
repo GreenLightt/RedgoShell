@@ -20,7 +20,6 @@ source         $filepath/common.sh
 ##################################
 # Variable
 ##################################
-back_folder=/tmp/mysql_backup
 
 ##################################
 # Function
@@ -35,10 +34,28 @@ function ValidateConfigFile() {
     CheckFileExist $1
     # Validate File Format
     format=$(cat $1 | awk '{print $1}' | tr '\n' ' ')
-    if [ "$format" != "# DatabaseName User Password MysqlDump " ]; then
+    echo $format
+    if [ "$format" != "# DatabaseName User Password Mysql Manager ManagerPassword " ]; then
         echo "$1 is not need config file"
         exit 2
     fi
+}
+
+function CreateDatabase() {
+    $mysql -u$datebase_user -p$database_password \
+        -e "CREATE DATABASE
+            IF NOT EXISTS $database_name
+            DEFAULT CHARSET utf8 COLLATE utf8_general_ci;"
+}
+
+function CreateDatabaseManager() {
+    $mysql -u$datebase_user -p$database_password \
+        -e "CREATE USER '$database_manager'@'localhost'
+            IDENTIFIED BY '$database_manager_password';" \
+        -e "GRANT ALL PRIVILEGES ON $database_name.*
+            TO '$database_manager'@'localhost'
+            IDENTIFIED BY '$database_manager_password';" \
+        -e "flush privileges;"
 }
 
 ##################################
@@ -61,10 +78,11 @@ else
         esac
     done
     if [ "$database_name" != "" ]; then
-        echo "Start backup ..."
-        tmp_file=$(BackupDataBase)
-        echo "End backup. The Backup File is "$tmp_file
+        echo "Start Create ..."
+        CreateDatabase
+        CreateDatabaseManager
+        echo "Create Success."
     else
-        echo "Backup failed."
+        echo "Create failed."
     fi
 fi

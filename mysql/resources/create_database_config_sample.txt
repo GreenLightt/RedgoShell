@@ -1,0 +1,7 @@
+# This is config file for create mysql database and it's manager.
+DatabaseName ''
+User ''
+Password ''
+Mysql ''
+Manager ''
+ManagerPassword ''

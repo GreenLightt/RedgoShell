@@ -8,23 +8,27 @@
 ##################################
 config_file=''
 database_name=''
+# Username to enter mysql
 datebase_user=''
+# User's password to enter mysql
 database_password=''
 
+# Command mysqlDump 's location
 mysqldump=''
+# Command mysql 's location
+mysql=''
+# Folder for backup database
 back_folder=/tmp/mysql_backup
+
+# Manager of created database
+database_manager=''
+# Manager password of created database
+database_manager_password=''
 
 ##################################
 # Function
 ##################################
 function ReadConfigFile() {
-    CheckFileExist $1
-    # Validate File Format
-    format=$(cat $1 | awk '{print $1}' | tr '\n' ' ')
-    if [ "$format" != "# DatabaseName User Password " ]; then
-        echo "$1 is not need config file"
-    fi
-    # Read
     while read line
     do
         param_name=$(echo $line | awk '{print $1}')
@@ -43,12 +47,21 @@ function ReadConfigFile() {
             'MysqlDump')
                 mysqldump=${param_value//\'/}
                 ;;
+            'Mysql')
+                mysql=${param_value//\'/}
+                ;;
+            'Manager')
+                database_manager=${param_value//\'/}
+                ;;
+            'ManagerPassword')
+                database_manager_password=${param_value//\'/}
+                ;;
         esac
     done < $1
 }
 
 function BackupDataBase() {
-    # mkdir
+    # Mkdir
     if [ ! -d $back_folder ]; then
         mkdir $back_folder
     fi
