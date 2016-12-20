@@ -31,6 +31,25 @@ function Usage() {
     exit 2
 }
 
+function SplitFile() {
+    file_size=$(du $split_file| awk '{print $1}')
+    block_size=$(expr $(expr $file_size / $chip_numbers) + 1)
+
+    remind_size=$file_size
+    for (( i=1; i <= $chip_numbers; i++)); do
+        if [ $remind_size -gt $block_size ]; then
+            count_size=$block_size
+        else
+            count_size=$remind_size
+        fi
+        skip_size=$(expr $block_size \* $(expr $i - 1))
+
+        target_file=$target_folder'/'${split_file##*/}'_'$i
+        dd if=$split_file bs=1024 count=$count_size skip=$skip_size of=$target_file
+        remind_size=$(expr $remind_size - $block_size)
+    done
+}
+
 ##################################
 # Execute
 ##################################
@@ -41,17 +60,44 @@ else
     do
         case "$option" in
             f)
-                echo 'f '$OPTARG
+                split_file=$OPTARG
                 ;;
             d)
-                echo 'd '$OPTARG
+                target_folder=$OPTARG
                 ;;
             n)
-                echo 'n '$OPTARG
+                if [ "$OPTARG" != "0" ]; then
+                    chip_numbers=$OPTARG
+                fi
                 ;;
             \?)
                 Usage
                 ;;
         esac
     done
+
+    # Validate
+    #  Validate Split File
+    if [ "$split_file" = "" ];then
+        echo 'The value of option -f is empty.'
+        exit 2
+    fi
+    CheckFileExist $split_file
+
+    #  Validate Chip Numbers
+    CheckIsNumber $chip_numbers
+
+    #  Validate Target Folder
+    if [ "$target_folder" = "" ];then
+        echo 'The value of option -d is empty.'
+        exit 2
+    fi
+    target_folder=$(Relative2AbsolutePath $target_folder)
+    MakeFolderExist $target_folder
+
+    SplitFile
+
+    if [ $? -eq 0 ]; then
+        echo 'Excute success.'
+    fi
 fi

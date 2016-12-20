@@ -43,7 +43,7 @@ function CheckFolderEmpty() {
 
 function MakeFolderExist() {
     if [ ! -d $1 ]; then
-        mkdir $1
+        mkdir -p $1
     fi
 }
 
@@ -90,4 +90,15 @@ function CountFileOrFolderSize() {
     # h : print sizes in human readable format (e.g., 1K 234M 2G)
     size=$(du -sh $1 | awk '{print $1}')
     return $size
+}
+
+##################################
+# Number
+##################################
+function CheckIsNumber() {
+    expr $1 + 0 &>/dev/null
+    if [ $? -ne 0 ]; then
+        echo $1' is not number.'
+        exit 2
+    fi
 }
