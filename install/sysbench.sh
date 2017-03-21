@@ -36,6 +36,9 @@ function CheckGit() {
 function Download() {
     MakeFolderExist $install_fold
     git clone -b master --depth=1 $sysbench_git_src $install_fold
+
+    yum install -y automake
+    yum install -y libtool
 }
 
 function Config() {
