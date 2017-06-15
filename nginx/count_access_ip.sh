@@ -54,4 +54,5 @@ if [[ "$access_log" = "" ]] || [[ ! -f $access_log ]]; then
     exit 2;
 fi
 
-awk '{print $1}' $access_log | sort | uniq -c |sort -n | awk -v threshold=$threshold '$1 > threshold {print $0}'
+awk '{print $1}' $access_log | sort | uniq -c |sort -n \
+    | awk -v threshold=$threshold '$1 > threshold {print $0}'
