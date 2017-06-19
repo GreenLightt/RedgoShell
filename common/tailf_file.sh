@@ -1,6 +1,6 @@
 #! /bin/bash
 #####################################################################
-#   Goal: Print Nginx Error Log File
+#   Goal: Tailf File
 #####################################################################
 
 ##################################
@@ -14,17 +14,37 @@ if [ ! -f $file ]; then
 fi
 source $file
 
-##################################
-# Variable
-##################################
-error_log_file=/opt/bksite/nginx/logs/error.log
+#############################
+# Function
+#############################
+function Usage() {
+    echo "Usage: $(readlink -f $0) -f file "
+    # exit status, 2 means Incorrect Usage
+    exit 2
+}
 
 ##################################
 # Execute
 ##################################
-CheckFileExist $error_log_file
+file=''
 
-tailf $error_log_file | while read -r line;
+while getopts f: option
+do
+    case "$option" in
+        f)
+            file=${OPTARG}
+            ;;
+        \?)
+            Usage
+            ;;
+    esac
+done
+
+if [[ "$file" = "" ]] || [[ ! -f $file ]]; then
+    Usage
+fi
+
+tailf $file | while read -r line;
 do
     echo -e $line;
 done
