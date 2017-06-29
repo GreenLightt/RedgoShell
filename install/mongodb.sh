@@ -33,9 +33,9 @@ tmp_ctags_install=/tmp/mongodb
 function InstallMongoDB() {
     wget -P $download_folder $source_file_src
     tar xvf $download_folder'/'$source_file -C $tmp_ctags_install > /dev/null
-    cd $tmp_ctags_install'/redis-stable'
-    make
-    make install
+    #cd $tmp_ctags_install'/redis-stable'
+    #make
+    #make install
 }
 
 ##################################
