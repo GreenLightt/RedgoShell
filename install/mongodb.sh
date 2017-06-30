@@ -24,8 +24,9 @@ download_folder=/tmp
 # redis文件压缩包的名字
 source_file=mongodb-linux-x86_64-3.4.5.tgz
 # 临时安装文件夹
-#tmp_ctags_install=/tmp/mongodb$(date +%s)
-tmp_ctags_install=/tmp/mongodb
+tmp_ctags_install=/tmp/mongodb$(date +%s)
+# 正规存放 mongodb 的位置
+mongodb_folder=/home/mongodb
 
 ##################################
 # Function
@@ -33,9 +34,13 @@ tmp_ctags_install=/tmp/mongodb
 function InstallMongoDB() {
     wget -P $download_folder $source_file_src
     tar xvf $download_folder'/'$source_file -C $tmp_ctags_install > /dev/null
-    #cd $tmp_ctags_install'/redis-stable'
-    #make
-    #make install
+    # 将解压出的文件移动到 /usr/local/mongodb 下
+    mv  $tmp_ctags_install'/mongodb-linux-x86_64-3.4.5'/ $mongodb_folder
+    cd $mongodb_folder
+    # 创建数据库目录
+    mkdir -p data/db
+    # 创建日志目录
+    mkdir -p logs
 }
 
 ##################################
@@ -43,11 +48,10 @@ function InstallMongoDB() {
 ##################################
 MakeFolderExist $tmp_ctags_install
 
-#redis-server --help >/dev/null 2>&1
-#if [ $? -ne 0 ]; then
+if [ ! -d $mongodb_folder ]; then
     InstallMongoDB
-#    rm -rf $tmp_ctags_install
-#
-#else
-#    echo 'MongoDB has installed.'
-#fi
+    rm -rf $tmp_ctags_install
+    echo 'MongoDB install successd in '$mongodb_folder
+else
+    echo 'MongoDB has installed.'
+fi
