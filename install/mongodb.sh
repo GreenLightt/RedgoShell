@@ -51,6 +51,7 @@ MakeFolderExist $tmp_ctags_install
 if [ ! -d $mongodb_folder ]; then
     InstallMongoDB
     rm -rf $tmp_ctags_install
+    rm -rf /tmp/$source_file
     echo 'MongoDB install successd in '$mongodb_folder
 else
     echo 'MongoDB has installed.'
