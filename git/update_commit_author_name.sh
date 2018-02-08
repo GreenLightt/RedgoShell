@@ -8,8 +8,10 @@
 ##################################
 # Import File
 ##################################
-filepath=$(cd "$(dirname "$0")"; pwd)
-file=$filepath"/../common"/common.sh
+
+current_path=$(cd "$(dirname "$0")"; pwd)
+
+file=$current_path"/common.sh"
 if [ ! -f $file ]; then
     echo $file" file is not exist"
     exit 2;
@@ -19,18 +21,27 @@ source $file
 ##################################
 # Variable
 ##################################
+# 旧的作者名
 old_name=""
+# 新的作者名
 new_name=""
 
 ##################################
 # Function
 ##################################
+
+# 功能：输出 命令使用说明
+# 参数：无
+# 返回：无
 function Usage() {
     echo "Usage: $(readlink -f $0)"' [git_folder] ["old_author_name"] ["new_author_name"]'
     # exit status, 2 means Incorrect Usage
     exit 2
 }
 
+# 功能：更新 author name 信息
+# 参数：无
+# 返回：无
 function UpdateAuthorName() {
     
     export OLD_NAME=$old_name

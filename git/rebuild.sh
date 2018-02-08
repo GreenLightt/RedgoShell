@@ -1,36 +1,44 @@
 #! /bin/bash
 #####################################################################
-#   Goal: Build Git Repository And Remove Old Repository
+#   目的：重构 Git 仓库
 #
-#   Note: you will discard all branch except current branch!
+#   注意：你将会丢弃所有分支，除了当前的分支
 #####################################################################
 
 ##################################
 # Import File
 ##################################
-filepath=$(cd "$(dirname "$0")"; pwd)
-file=$filepath"/../common"/common.sh
+
+current_path=$(cd "$(dirname "$0")"; pwd)
+
+# 引入 git 模块的 common.sh
+file=$current_path"/common.sh"
 if [ ! -f $file ]; then
     echo $file" file is not exist"
     exit 2;
 fi
 source $file
 
-git_common_path=$filepath/common.sh
-CheckFileExist $git_common_path
-source $git_common_path
-
-do_config_file_path=$filepath/do_config.sh
+##################################
+# Variable
+##################################
 
 ##################################
 # Function
 ##################################
+
+# 功能：输出 命令使用说明
+# 参数：无
+# 返回：无
 function Usage() {
     echo "Usage: $(readlink -f $0) [git_folder]"
     # exit status, 2 means Incorrect Usage
     exit 2
 }
 
+# 功能：重构 Git 仓库
+# 参数：Git 仓库目录路径
+# 返回：无
 function ReBuild(){
     git_root_path=$1
     cd $git_root_path
@@ -67,8 +75,6 @@ if [ $# -ne 1 ]; then
 fi
 
 # Validate Git Root Folder
-git_root_path=$(Relative2AbsolutePath $1)
-#CheckGitFolder $git_root_path
-CheckGitRootFolder $git_root_path
+CheckGitRootFolder $(Relative2AbsolutePath $1)
 
-ReBuild $git_root_path
+ReBuild $(Relative2AbsolutePath $1)
