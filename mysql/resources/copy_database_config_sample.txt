@@ -1,5 +1,0 @@
-# This is config file for copying mysql database.
-DatabaseName ''
-User ''
-Password ''
-MysqlDump ''
