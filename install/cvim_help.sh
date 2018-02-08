@@ -6,8 +6,11 @@
 ##################################
 # Import File
 ##################################
-filepath=$(cd "$(dirname "$0")"; pwd)
-file=$filepath"/../common"/common.sh
+
+current_path=$(cd "$(dirname "$0")"; pwd)
+
+# 引入 common 模块的 common.sh
+file=$current_path"/../common"/common.sh
 if [ ! -f $file ]; then
     echo $file" file is not exist"
     exit 2;
@@ -17,8 +20,11 @@ source $file
 ##################################
 # Variable
 ##################################
-resource_file=$filepath"/resources/vimcdoc-1.8.0.tar.gz"
+# 安装包
+resource_file=$current_path"/resources/vimcdoc-1.8.0.tar.gz"
+# 解压安装包时，临时存放目录
 tar_dest=/tmp/chelp$(date +%s)
+# vim 目录，用于存放 doc 目录数据
 vim_folder=/root/.vim
 
 ##################################

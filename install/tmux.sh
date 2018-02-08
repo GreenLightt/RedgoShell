@@ -6,8 +6,11 @@
 ##################################
 # Import File
 ##################################
-filepath=$(cd "$(dirname "$0")"; pwd)
-file=$filepath"/../common"/common.sh
+
+current_path=$(cd "$(dirname "$0")"; pwd)
+
+# 引入 common 模块的 common.sh
+file=$current_path"/../common"/common.sh
 if [ ! -f $file ]; then
     echo $file" file is not exist"
     exit 2;
@@ -17,20 +20,31 @@ source $file
 ##################################
 # Variable
 ##################################
-tmux_resource=$filepath'/resources/tmux-1.6.tar.gz'
+# 安装包
+tmux_resource=$current_path'/resources/tmux-1.6.tar.gz'
+# tmux 配置文件
+tmux_conf_resource=$current_path'/resources/tmux.conf'
+# 解压安装包时，临时存放目录
 tar_dest=/tmp/tmux$(date +%s)
-tmux_conf_resource=$filepath'/resources/tmux.conf'
+# 使用环境需要的 配置文件
 tmux_conf=/root/.tmux.conf
 
 ##################################
 # Function
 ##################################
+
+# 功能：安装依赖
+# 参数：无
+# 返回：无
 function InstallSupport() {
     # Install Need Support
     echo "Install Need Support..."
     yum install -y libevent-devel ncurses-devel >/dev/null 2>&1
 }
 
+# 功能：解压及编译
+# 参数：无
+# 返回：无
 function UnpackageAndCompile() {
     echo "Unpackage "$tmux_resource"..."
     MakeFolderExist $tar_dest

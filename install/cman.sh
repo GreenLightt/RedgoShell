@@ -1,13 +1,16 @@
 #! /bin/bash
 #####################################################################
-#   Goal: Install Man With Chinese Language
+#   目的：安装中文版的 Man
 #####################################################################
 
 ##################################
 # Import File
 ##################################
-filepath=$(cd "$(dirname "$0")"; pwd)
-file=$filepath"/../common"/common.sh
+
+current_path=$(cd "$(dirname "$0")"; pwd)
+
+# 引入 common 模块的 common.sh
+file=$current_path"/../common"/common.sh
 if [ ! -f $file ]; then
     echo $file" file is not exist"
     exit 2;
@@ -17,19 +20,29 @@ source $file
 ##################################
 # Variable
 ##################################
-resource_file=$filepath"/resources/manpages-zh-1.5.1.tar.gz"
+# 安装包
+resource_file=$current_path"/resources/manpages-zh-1.5.1.tar.gz"
+# 解压安装包时，临时存放目录
 tar_dest=/tmp/cman$(date +%s)
+# 安装位置
 zhman_folder=/usr/local/zhman
 
 ##################################
 # Function
 ##################################
+
+# 功能：安装依赖
+# 参数：无
+# 返回：无
 function InstallChineseSupport() {
     # Install Chinese Support
     echo "Install Chinese Support..."
     yum groupinstall -y "Chinese Support" >/dev/null 2>&1
 }
 
+# 功能：解压及编译
+# 参数：无
+# 返回：无
 function UnpackageAndCompile() {
     echo "Unpackage "$resource_file"..."
     MakeFolderExist $tar_dest

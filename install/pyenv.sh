@@ -6,8 +6,11 @@
 ##################################
 # Import File
 ##################################
-filepath=$(cd "$(dirname "$0")"; pwd)
-file=$filepath"/../common"/common.sh
+
+current_path=$(cd "$(dirname "$0")"; pwd)
+
+# 引入 common 模块的 common.sh
+file=$current_path"/../common"/common.sh
 if [ ! -f $file ]; then
     echo $file" file is not exist"
     exit 2;
@@ -17,6 +20,10 @@ source $file
 ##################################
 # Function
 ##################################
+
+# 功能：安装依赖
+# 参数：无
+# 返回：无
 function PrepareNeedEnvironment() {
     yum -y install readline readline-devel readline-static
     yum -y install openssl openssl-devel openssl-static
@@ -24,6 +31,9 @@ function PrepareNeedEnvironment() {
     yum -y install bzip2-devel bzip2-libs
 }
 
+# 功能：安装
+# 参数：无
+# 返回：无
 function Install() {
     echo "Install Begin ..."
     git clone git://github.com/yyuu/pyenv.git ~/.pyenv

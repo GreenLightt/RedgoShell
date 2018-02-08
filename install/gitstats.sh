@@ -6,8 +6,11 @@
 ##################################
 # Import File
 ##################################
-filepath=$(cd "$(dirname "$0")"; pwd)
-file=$filepath"/../common"/common.sh
+
+current_path=$(cd "$(dirname "$0")"; pwd)
+
+# 引入 common 模块的 common.sh
+file=$current_path"/../common"/common.sh
 if [ ! -f $file ]; then
     echo $file" file is not exist"
     exit 2;
@@ -17,11 +20,16 @@ source $file
 ##################################
 # Variable
 ##################################
+# 存放源代码目录
 gitstats_container=/tmp
 
 ##################################
 # Function 
 ##################################
+
+# 功能：安装依赖
+# 参数：无
+# 返回：无
 function InstallGnuplot() {
     gnuplot -V >/dev/null 2>&1
 

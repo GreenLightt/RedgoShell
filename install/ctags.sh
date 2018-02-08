@@ -6,8 +6,11 @@
 ##################################
 # Import File
 ##################################
-filepath=$(cd "$(dirname "$0")"; pwd)
-file=$filepath"/../common"/common.sh
+
+current_path=$(cd "$(dirname "$0")"; pwd)
+
+# 引入 common 模块的 common.sh
+file=$current_path"/../common"/common.sh
 if [ ! -f $file ]; then
     echo $file" file is not exist"
     exit 2;
@@ -17,12 +20,18 @@ source $file
 ##################################
 # Variable
 ##################################
-ctags_resource=$filepath"/resources/ctags.gz"
+# 安装包
+ctags_resource=$current_path"/resources/ctags.gz"
+# 解压安装包时，临时存放目录
 tmp_ctags_install=/tmp/ctags$(date +%s)
 
 ##################################
 # Function
 ##################################
+
+# 功能：解压及编译
+# 参数：无
+# 返回：无
 function InstallCtags() {
     cd $tmp_ctags_install"/ctags"
     ./configure && make && make install
