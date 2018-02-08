@@ -1,13 +1,16 @@
 #! /bin/bash
 #####################################################################
-#   Goal: Count Ip That Access Nginx
+#   目的：统计超出指定访问 Nginx 次数 的 IP 及其次数
 #####################################################################
 
 ##################################
 # Import File
 ##################################
-filepath=$(cd "$(dirname "$0")"; pwd)
-file=$filepath"/../common"/common.sh
+
+current_path=$(cd "$(dirname "$0")"; pwd)
+
+# 引入 common 模块的 common.sh
+file=$current_path"/../common"/common.sh
 if [ ! -f $file ]; then
     echo $file" file is not exist"
     exit 2;
@@ -15,8 +18,20 @@ fi
 source $file
 
 ##################################
+# Variable
+##################################
+# Nginx 的访问日志
+access_log=''
+# 门槛值
+threshold=0
+
+##################################
 # Function
 ##################################
+
+# 功能：输出 命令使用说明
+# 参数：无
+# 返回：无
 function Usage() {
     echo "Usage: $(readlink -f $0) [-f access.log] {-n threshold_num}"
     # exit status, 2 means Incorrect Usage
@@ -31,9 +46,6 @@ if [ $# -eq 0 ]; then
     Usage
     exit 2;
 fi
-
-access_log=''
-threshold=0
 
 while getopts f:n: option
 do
