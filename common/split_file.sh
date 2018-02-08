@@ -1,13 +1,16 @@
 #! /bin/bash
 #####################################################################
-#   Goal: Split File To Target Dir In Target Chip
+#   目的：切割文件为指定数量的片
 #####################################################################
 
 ##################################
 # Import File
 ##################################
-filepath=$(cd "$(dirname "$0")"; pwd)
-file=$filepath"/../common"/common.sh
+
+current_path=$(cd "$(dirname "$0")"; pwd)
+
+# 引入 common 模块的 common.sh
+file=$current_path"/../common"/common.sh
 if [ ! -f $file ]; then
     echo $file" file is not exist"
     exit 2;
@@ -17,13 +20,20 @@ source $file
 ##################################
 # Variable
 ##################################
+# 切片的数量
 chip_numbers=1
+# 需要切片的文件
 split_file=''
+# 切片存放的目录
 target_folder=''
 
 ##################################
 # Function
 ##################################
+
+# 功能：输出 命令使用说明
+# 参数：无
+# 返回：无
 function Usage() {
     echo "Usage: $(readlink -f $0) -f [need_split_file] " \
             "-d [split_to_where] -n [chip_numbers]"
@@ -31,8 +41,13 @@ function Usage() {
     exit 2
 }
 
+# 功能：切片
+# 参数：无
+# 返回：无
 function SplitFile() {
+    # 获取文件大小
     file_size=$(du $split_file| awk '{print $1}')
+    # 获取单个切片大小
     block_size=$(expr $(expr $file_size / $chip_numbers) + 1)
 
     remind_size=$file_size
