@@ -17,11 +17,11 @@ source $file
 ##################################
 # Variable
 ##################################
-# redis源文件
+# mongodb源文件
 source_file_src=https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-3.4.5.tgz
 # 下载源文件到指定目录
 download_folder=/tmp
-# redis文件压缩包的名字
+# mongodb文件压缩包的名字
 source_file=mongodb-linux-x86_64-3.4.5.tgz
 # 临时安装文件夹
 tmp_ctags_install=/tmp/mongodb$(date +%s)
