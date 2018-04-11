@@ -1,0 +1,70 @@
+#! /bin/bash
+#####################################################################
+#   目的：统计超出指定访问 Nginx 次数 的 IP 及其次数
+#####################################################################
+
+##################################
+# Import File
+##################################
+
+current_path=$(cd "$(dirname "$0")"; pwd)
+
+# 引入 common 模块的 common.sh
+file=$current_path"/../common"/common.sh
+if [ ! -f $file ]; then
+    echo $file" file is not exist"
+    exit 2;
+fi
+source $file
+
+##################################
+# Variable
+##################################
+# Nginx 的访问日志
+access_log=''
+# 门槛值
+threshold=0
+
+##################################
+# Function
+##################################
+
+# 功能：输出 命令使用说明
+# 参数：无
+# 返回：无
+function Usage() {
+    echo "Usage: $(readlink -f $0) [-f access.log] {-n threshold_num}"
+    # exit status, 2 means Incorrect Usage
+    exit 2
+}
+
+##################################
+# Execute
+##################################
+# Validate Param
+if [ $# -eq 0 ]; then
+    Usage
+    exit 2;
+fi
+
+while getopts f:n: option
+do
+    case "$option" in
+        f)
+            access_log=${OPTARG}
+            ;;
+        n)
+            threshold=${OPTARG}
+            ;;
+        \?)
+            ;;
+    esac
+done
+
+if [[ "$access_log" = "" ]] || [[ ! -f $access_log ]]; then
+    echo "The access log <"$access_log"> file is not exist"
+    exit 2;
+fi
+
+awk '{print $1}' $access_log | sort | uniq -c |sort -n \
+    | awk -v threshold=$threshold '$1 > threshold {print $0}'
