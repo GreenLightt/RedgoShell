@@ -23,7 +23,8 @@ def parse(dict_options):
         # 对文件夹过滤 匹配 binlog.* , 同时是文件
         input_file = os.path.join(input_dir, input_files[i])
         if re.match('binlog.*', input_files[i]) and os.path.isfile(input_file):
-            convert(input_file, os.path.join(output_dir, input_files[i]))
+            with open(os.path.join(output_dir, input_files[i]), 'w') as output_file:
+                convert(input_file, output_file)
 
 def convert(input_file, output_file):
     # 读取文件内容，同时写入到输出文件夹的同文件名中
@@ -33,7 +34,8 @@ def convert(input_file, output_file):
         while True:
             # 管道名的长度
             tuplename_num = int(struct.unpack('i', fd.read(4))[0])
-            print(tuplename_num)
+            if tuplename_num > 201:
+                return 0
             if tuplename_num > 0:
                 # 管道名
                 tuplename = fd.read(tuplename_num)
@@ -41,11 +43,23 @@ def convert(input_file, output_file):
                 job = readJob(fd)
                 if not job:
                     break
-                print(job)
+                # 保存 tuplename
+                job['tuplename'] = tuplename
+                # 读取 body 内容
+                job['body'] = fd.read(int(job['body_size'])).replace("\r\n", "")
+                output_file.writelines("{id: %(id)s, pri: %(pri)s, state: '%(state)s', delay: %(delay)s, ttr: %(ttr)s, "
+                      "created_at: %(created_at)s, deadline_at: %(deadline_at)s, reserve_ct: %(reserve_ct)s, "
+                      "timeout_ct: %(timeout_ct)s, release_ct: %(release_ct)s, bury_ct: %(bury_ct)s, "
+                      "kick_ct: %(kick_ct)s, body_size: %(body_size)s, body: '%(body)s}' \n" % job)
             else:
                 # 直接读取 record
                 job = readJob(fd)
-                print(job)
+                if not job:
+                    break
+                output_file.writelines("{id: %(id)s, pri: %(pri)s, state: '%(state)s', delay: %(delay)s, ttr: %(ttr)s, "
+                      "created_at: %(created_at)s, deadline_at: %(deadline_at)s, reserve_ct: %(reserve_ct)s, "
+                      "timeout_ct: %(timeout_ct)s, release_ct: %(release_ct)s, bury_ct: %(bury_ct)s, "
+                      "kick_ct: %(kick_ct)s, body_size: %(body_size)s \n" % job)
 
 def readJob(fd):
     """ 读出一条 job """
@@ -61,6 +75,7 @@ def readJob(fd):
     #     精确到纳秒
     job['ttr']          = struct.unpack("q", fd.read(8))[0]
     job['body_size']   = struct.unpack("i", fd.read(4))[0]
+    _ = struct.unpack("I", fd.read(4))[0]
     #     创建时间， epoch 纪年，精确到纳秒
     job['created_at']  = struct.unpack("Q", fd.read(8))[0]
     #     下一个会因超时而产生状态变迁的时间
@@ -70,11 +85,15 @@ def readJob(fd):
     job['release_ct']  = struct.unpack("I", fd.read(4))[0]
     job['bury_ct']     = struct.unpack("I", fd.read(4))[0]
     job['kick_ct']     = struct.unpack("I", fd.read(4))[0]
-    job['state']       =  struct.unpack("b", fd.read(1))[0]
+    job['state']       =  getStateDesc(struct.unpack("b", fd.read(1))[0])
     #     对齐用的
-    _ = struct.unpack("7s", fd.read(7))[0]
-    job['body']        = fd.read(int(job['body_size'])).replace("\r\n", "")
+    _ = struct.unpack("3s", fd.read(3))[0]
     return job
+
+def getStateDesc(state):
+    """根据状态的 flag 返回描述"""
+    state_map = {0: "Invalid", 1: "Ready", 2: "Reserved", 3: "Buried", 4: "Delayed", 5: "Copy"}
+    return state_map[state]
 
 if __name__ == '__main__':
     try:
